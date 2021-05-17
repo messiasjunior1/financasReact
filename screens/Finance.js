@@ -1,67 +1,98 @@
-import React, { useState, useEffect, useRef} from "react";
-import firebase from '../src/firebaseConfig';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList } from "react-native";
-import FinanceItem from './FinanceItem'
-import Icon from "react-native-vector-icons/Feather";
+import React, { useState, useEffect, useRef } from "react";
+import firebase from "../src/firebaseConfig";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  FlatList,
+  Keyboard,
+} from "react-native";
+import FinanceItem from "./FinanceItem";
 
-export default function Finance({ data, deleteItem, editItem }) {
+export default function Finance() {
   async function addBalance() {
     if (newBalance !== "") {
       let balances = await firebase.database().ref("balances");
-      let key = balances.push().key;
-      balances.child(key).set({
-        desc: newBalance,
-      });
 
-      setNewBalance('');
-      Keyboard.Dismiss();
+      if (key !== "") {
+        balances.child(key).update({
+          desc: newBalance,
+        });
+        setKey = "";
+      } else {
+        let key = balances.push().key;
+        balances.child(key).set({
+          desc: newBalance,
+        });
+        setNewBalance("");
+        Keyboard.dismiss();
+      }
     }
   }
+
+  async function deleteFinance(key) {
+    await firebase.database().ref("balances").child(key).remove();
+  }
+
+  /* function editBalance(item) {
+    setBalances(item.desc);
+    setKey(item.key);
+    inputRef.current.focus();
+  }  */
+
   const inputRef = useRef(null);
 
-  const [newBalance, setNewBalance] = useState('');
+  const [newBalance, setNewBalance] = useState("");
   const [balances, setBalances] = useState([]);
+  const [key, setKey] = useState("");
 
   useEffect(() => {
     async function loadBalance() {
-        setBalances([]);
-        await firebase.database().ref('balances').on('value', (snapshot) => {
-            snapshot.forEach((item) => {
-                let balance = {
-                    key: item.key,
-                    desc: item.val().desc,
-                    valor: item.val().valor
-                };
-                setBalances(oldArray => [...oldArray, balance]);
-            })
+      await firebase
+        .database()
+        .ref("balances")
+        .on("value", (snapshot) => {
+          setBalances([]);
+          snapshot.forEach((item) => {
+            let balance = {
+              key: item.key,
+              desc: item.val().desc,
+              valor: item.val().valor,
+            };
+            setBalances((oldArray) => [...oldArray, balance]);
+          });
         });
     }
 
     loadBalance();
-  }, [])
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.containerBalance}>
         <TextInput
           style={styles.input}
+          keyboardType="numeric"
           placeholder="Digite uma receita"
           onChangeText={(texto) => setNewBalance(texto)}
           value={newBalance}
           ref={inputRef}
         ></TextInput>
-        <TouchableOpacity>
+        <TouchableOpacity style={styles.buttonAdd} onPress={addBalance}>
           <Text>+</Text>
         </TouchableOpacity>
       </View>
-
-      <FlatList
-      data={balances}
-      keyExtractor={item => item.key}
-      renderItem={ ({ item }) => (
-          <FinanceItem data={item}/>
-      )}
-      />
+      <View>
+        <FlatList
+          data={balances}
+          keyExtractor={(item) => item.key}
+          renderItem={({ item }) => (
+            <FinanceItem data={item} deleteItem={deleteFinance} />
+          )}
+        />
+      </View>
     </View>
   );
 }
@@ -69,25 +100,34 @@ export default function Finance({ data, deleteItem, editItem }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
     padding: 15,
     borderRadius: 10,
   },
   containerBalance: {
-      flexDirection: 'row'
+    flexDirection: "row",
   },
   buttonAdd: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: 40,
-      backgroundColor: '#aaa',
-      paddingLeft: 11,
-      paddingRight: 11,
-      amrginleft: 10,
-      borderRadius: 10,
-      borderWidth: 2,
-      borderColor: '#000'
-  }
+    justifyContent: "center",
+    alignItems: "center",
+    height: 40,
+    backgroundColor: "#fff",
+    paddingLeft: 11,
+    paddingRight: 11,
+    marginLeft: 10,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#8732a8",
+  },
+  input: {
+    flex: 1,
+    marginBottom: 30,
+    padding: 10,
+    borderWidth: 2,
+    borderColor: "#8732a8",
+    height: 40,
+    fontSize: 17,
+    borderRadius: 10,
+  },
 });

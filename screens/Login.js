@@ -61,6 +61,7 @@ export default function Login() {
         .on('value', (snapshot) => {
           let nomeUsuario = snapshot.val().nome;
           saveUser(nomeUsuario);
+          navigation.navigate('Home');
         })      
       return;
     })

@@ -13,7 +13,7 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Registro">
+      <Stack.Navigator initialRouteName="Finanças">
         <Stack.Screen
           name="Inicial"
           component={Home}
@@ -36,14 +36,18 @@ export default function App() {
           }}
         />
         <Stack.Screen
-          options={{
-            headerStyle: {
-              backgroundColor: "#bf42f5",
-            },
-            headerShown: true,
-          }}
           name="Finanças"
           component={Finance}
+          options={{
+            headerStyle: {
+              backgroundColor: "#8732a8",
+            },
+            headerTintColor: '#fff',
+            headerShown: true,
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>
