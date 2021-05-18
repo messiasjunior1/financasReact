@@ -70,6 +70,7 @@ export default function Login() {
       <Text style={styles.texto}>Senha</Text>
       <TextInput
         style={styles.input}
+        secureTextEntry={true}
         underlineColorAndroid="transparent"
         onChangeText={(texto) => setPassword(texto) }
         value={password}
