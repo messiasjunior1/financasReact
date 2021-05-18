@@ -9,78 +9,83 @@ import {
   FlatList,
   Keyboard,
 } from "react-native";
-import FinanceItem from "./FinanceItem";
+import ExpenseItem from "./ExpenseItem";
 
-export default function Finance() {
-  async function addBalance() {
-    if (newBalance !== "") {
-      let balances = await firebase.database().ref("balances");
+export default function Expense() {
+    const [uid, setUid] = useState('');
+
+    async function loadUid() {
+        await AsyncStorage.getItem("uid").then((value) => {
+          setUid(value);
+        });
+      }
+    useEffect(() => {
+        loadUid();
+      }, []);
+
+  async function addExpense() {
+    if (newExpense !== "") {
+      let expenses = await firebase.database().ref(uid);
 
       if (key !== "") {
-        balances.child(key).update({
-          desc: newBalance,
+        expenses.child("expenses",key).update({
+          desc: newExpense,
           valor: newValue,
         });
         setKey = "";
       } else {
-        let key = balances.push().key;
-        balances.child(key).set({
-          desc: newBalance,
+        let key = expenses.push().key;
+        expenses.child(key).set({
+          desc: newExpense,
           valor: newValue,
         });
-        setNewBalance("");
+        setNewExpense("");
         setNewValue("");
         Keyboard.dismiss();
       }
     }
   }
 
-  async function deleteFinance(key) {
-    await firebase.database().ref("balances").child(key).remove();
+  async function deleteExpense(key) {
+    await firebase.database().ref(uid,"/expenses").child(key).remove();
   }
-
-  /* function editBalance(item) {
-    setBalances(item.desc);
-    setKey(item.key);
-    inputRef.current.focus();
-  }  */
 
   const inputRef = useRef(null);
 
-  const [newBalance, setNewBalance] = useState("");
+  const [newExpense, setNewExpense] = useState("");
   const [newValue, setNewValue] = useState("");
-  const [balances, setBalances] = useState([]);
+  const [expenses, setexpenses] = useState([]);
   const [key, setKey] = useState("");
 
   useEffect(() => {
-    async function loadBalance() {
+    async function loadExpense() {
       await firebase
         .database()
-        .ref("balances")
+        .ref(uid,"/expenses")
         .on("value", (snapshot) => {
-          setBalances([]);
+          setexpenses([]);
           snapshot.forEach((item) => {
-            let balance = {
+            let Expense = {
               key: item.key,
               desc: item.val().desc,
               valor: item.val().valor,
             };
-            setBalances((oldArray) => [...oldArray, balance]);
+            setexpenses((oldArray) => [...oldArray, Expense]);
           });
         });
     }
 
-    loadBalance();
+    loadExpense();
   }, []);
 
   return (
     <View style={styles.container}>
-      <View style={styles.containerBalance}>
+      <View style={styles.containerExpense}>
         <TextInput
           style={styles.input1}
           placeholder="Digite a descrição"
-          onChangeText={(texto) => setNewBalance(texto)}
-          value={newBalance}
+          onChangeText={(texto) => setNewExpense(texto)}
+          value={newExpense}
           ref={inputRef}
         />
         <TextInput
@@ -93,16 +98,16 @@ export default function Finance() {
         />
       </View>
       <View>
-        <TouchableOpacity style={styles.buttonAdd} onPress={addBalance}>
+        <TouchableOpacity style={styles.buttonAdd} onPress={addExpense}>
           <Text style={styles.textButton}>Adicionar despesa</Text>
         </TouchableOpacity>
       </View>
       <View>
         <FlatList
-          data={balances}
+          data={expenses}
           keyExtractor={(item) => item.key}
           renderItem={({ item }) => (
-            <FinanceItem data={item} deleteItem={deleteFinance} />
+            <ExpenseItem data={item} deleteItem={deleteExpense} />
           )}
         />
       </View>
@@ -118,7 +123,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
   },
-  containerBalance: {
+  containerExpense: {
     flexDirection: "row",
   },
   buttonAdd: {

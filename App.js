@@ -7,13 +7,13 @@ import Home from "./screens/Home";
 import Login from "./screens/Login";
 import Register from "./screens/Register";
 import Finance from "./screens/Finance";
-
+import Expense from "./screens/Expense"
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Finanças">
+      <Stack.Navigator initialRouteName="Login">
         <Stack.Screen
           name="Inicial"
           component={Home}
@@ -36,8 +36,22 @@ export default function App() {
           }}
         />
         <Stack.Screen
-          name="Finanças"
+          name="Receitas"
           component={Finance}
+          options={{
+            headerStyle: {
+              backgroundColor: "#8732a8",
+            },
+            headerTintColor: '#fff',
+            headerShown: true,
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
+        />
+                <Stack.Screen
+          name="Despesas"
+          component={Expense}
           options={{
             headerStyle: {
               backgroundColor: "#8732a8",

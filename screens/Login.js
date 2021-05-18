@@ -8,13 +8,10 @@ import { useNavigation } from '@react-navigation/core';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [uid, setUid] = useState('');
   const [user, setUser] = useState('');
   const navigation = useNavigation();
 
-  useEffect(() => {
-    loadUser();
-  }, []);
 
   const pressHandler = () => {
       navigation.navigate('Registro');
@@ -26,33 +23,13 @@ export default function Login() {
     await AsyncStorage.setItem('nome', nomeUsuario);
   }
 
-  async function loadUser(){
-    await AsyncStorage.getItem('nome')
-    .then((value) => {
-      setUser(value);
-    });
+  async function saveUid(userId){
+    setUid(userId);
+    await AsyncStorage.setItem('uid', userId);
   }
 
-  async function cadastrar(){
 
-    await firebase.auth().createUserWithEmailAndPassword(email, password)
-    .then((value) => {
-      firebase.database().ref('usuarios').child(value.user.uid).set({
-        nome: name
-      })
-      alert('Usuário criado com sucesso!');
-      saveUser(name);
-      return;
-    })
-    .catch((error) => {
-      alert('Algo errado aconteceu!');
-      return;
-    })
-
-    setEmail('');
-    setPassword('');
-    setName('');
-   }
+  
 
   async function logar(){
     await firebase.auth().signInWithEmailAndPassword(email, password)
@@ -60,8 +37,10 @@ export default function Login() {
       firebase.database().ref('usuarios').child(value.user.uid)
         .on('value', (snapshot) => {
           let nomeUsuario = snapshot.val().nome;
+          let userId = value.user.uid;
+          saveUid(userId);
           saveUser(nomeUsuario);
-          navigation.navigate('Home');
+          navigation.navigate('Inicial');
         })      
       return;
     })
@@ -73,14 +52,8 @@ export default function Login() {
 
     setEmail('');
     setPassword('');
-    setName('')
   }
 
-  async function sair(){
-    await firebase.auth().signOut();
-    AsyncStorage.clear();
-    setUser('');
-  }
 
   return (
     <View style={styles.container}>
@@ -102,10 +75,12 @@ export default function Login() {
         value={password}
       />
 
-      <Button
-        title="Logar"
-        onPress={logar}
-      />
+      <TouchableOpacity
+      style={styles.buttonStyle1}
+                  onPress={logar}
+      >
+        <Text style={styles.textButton}>Logar</Text>
+      </TouchableOpacity>
 
 
       <TouchableOpacity style={styles.buttonStyle}
@@ -129,16 +104,32 @@ const styles = StyleSheet.create({
   texto: {
     fontSize: 20,
   },
-  input:{
-    marginBottom: 10,
+  input: {
+    marginBottom: 15,
     padding: 10,
-    borderWidth: 1,
-    borderColor: '#aaa',
-    height: 45,
-    fontSize: 17
+    borderWidth: 2,
+    borderColor: "#8732a8",
+    height: 40,
+    fontSize: 17,
+    borderRadius: 10,
   },
     buttonStyle: {
         paddingTop: 16,
         alignItems: 'center'
+    },
+
+    buttonStyle1: {
+      backgroundColor: "#8732a8",
+      alignItems: "center",
+      padding: 15,
+      borderRadius: 15,
+      marginBottom: 15,
+      height: 60,
+      width: 325,
+    },
+    textButton: {
+     color: '#fff',
+     fontWeight: 'bold',
+     fontSize: 20
     }
 });

@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 
-export default function FinanceItem({ data, deleteItem }) {
+export default function ExpenseItem({ data, deleteItem }) {
   return (
     <View style={styles.container}>
       <View style={{ flexDirection: 'row'}}>

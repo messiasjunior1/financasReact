@@ -50,26 +50,6 @@ export default function Register() {
     setName('');
    }
 
-  async function logar(){
-    await firebase.auth().signInWithEmailAndPassword(email, password)
-    .then((value) => { 
-      firebase.database().ref('usuarios').child(value.user.uid)
-        .on('value', (snapshot) => {
-          let nomeUsuario = snapshot.val().nome;
-          saveUser(nomeUsuario);
-        })      
-      return;
-    })
-    .catch(() => {
-          alert('Algo errado aconteceu!');
-          return;
-    })
-
-    setEmail('');
-    setPassword('');
-    setName('')
-  }
-
   async function sair(){
     await firebase.auth().signOut();
     AsyncStorage.clear();
