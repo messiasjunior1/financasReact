@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import firebase from "../src/firebaseConfig";
 import {
   View,
@@ -12,38 +13,35 @@ import {
 import FinanceItem from "./FinanceItem";
 
 export default function Finance() {
-  async function addBalance() {
-    if (newBalance !== "") {
-      let balances = await firebase.database().ref("balances");
+  const [uid, setUid] = useState("");
 
-      if (key !== "") {
-        balances.child(key).update({
-          desc: newBalance,
-          valor: newValue,
-        });
-        setKey = "";
-      } else {
-        let key = balances.push().key;
-        balances.child(key).set({
-          desc: newBalance,
-          valor: newValue,
-        });
-        setNewBalance("");
-        setNewValue("");
-        Keyboard.dismiss();
-      }
+  async function loadUid() {
+    await AsyncStorage.getItem("uid").then((value) => {
+      setUid(value);
+    });
+  }
+
+  useEffect(() => {
+    loadUid();
+  }, []);
+
+  async function addBalance() {
+    if (newBalance !== "" || newValue !== "") {
+      let balances = await firebase.database().ref('balances');
+      let key = balances.push().key;
+      balances.child(key).set({
+        desc: newBalance,
+        valor: newValue,
+      });
+      setNewBalance("");
+      setNewValue("");
+      Keyboard.dismiss();
     }
   }
 
   async function deleteFinance(key) {
-    await firebase.database().ref("balances").child(key).remove();
+    await firebase.database().ref('balances').child(key).remove();
   }
-
-  /* function editBalance(item) {
-    setBalances(item.desc);
-    setKey(item.key);
-    inputRef.current.focus();
-  }  */
 
   const inputRef = useRef(null);
 
@@ -94,7 +92,7 @@ export default function Finance() {
       </View>
       <View>
         <TouchableOpacity style={styles.buttonAdd} onPress={addBalance}>
-          <Text style={styles.textButton}>Adicionar despesa</Text>
+          <Text style={styles.textButton}>Adicionar receita</Text>
         </TouchableOpacity>
       </View>
       <View>
@@ -132,7 +130,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
     borderColor: "#8732a8",
-    marginBottom: 15
+    marginBottom: 15,
   },
   input: {
     flex: 1,
@@ -153,10 +151,10 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 17,
     borderRadius: 10,
-    marginRight: 5
+    marginRight: 5,
   },
   textButton: {
-    color: '#000',
-    fontWeight: 'bold'
-  }
+    color: "#000",
+    fontWeight: "bold",
+  },
 });
