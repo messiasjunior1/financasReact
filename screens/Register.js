@@ -81,10 +81,14 @@ export default function Register() {
         onChangeText={(texto) => setPassword(texto) }
         value={password}
       />
-      <Button
-        title="Cadastrar"
-        onPress={cadastrar}
-      />
+       <TouchableOpacity
+      style={styles.buttonStyle1}
+                  onPress={cadastrar}
+      >
+        <Text style={styles.textButton}>Cadastrar</Text>
+      </TouchableOpacity>
+
+
       <TouchableOpacity style={styles.buttonStyle}
       onPress={() => {
         navigation.navigate('Login')}}
@@ -107,16 +111,31 @@ const styles = StyleSheet.create({
   texto: {
     fontSize: 20,
   },
-  input:{
-    marginBottom: 10,
+  input: {
+    marginBottom: 15,
     padding: 10,
-    borderWidth: 1,
-    borderColor: '#aaa',
-    height: 45,
-    fontSize: 17
+    borderWidth: 2,
+    borderColor: "#8732a8",
+    height: 40,
+    fontSize: 17,
+    borderRadius: 10,
   },
   buttonStyle: {
     paddingTop: 16,
     alignItems: 'center'
+},
+buttonStyle1: {
+  backgroundColor: "#8732a8",
+  alignItems: "center",
+  padding: 15,
+  borderRadius: 15,
+  marginBottom: 15,
+  height: 60,
+  width: 325,
+},
+textButton: {
+ color: '#fff',
+ fontWeight: 'bold',
+ fontSize: 20
 }
 });

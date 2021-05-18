@@ -25,10 +25,10 @@ export default function Expense() {
 
   async function addExpense() {
     if (newExpense !== "") {
-      let expenses = await firebase.database().ref(uid);
+      let expenses = await firebase.database().ref("expenses");
 
       if (key !== "") {
-        expenses.child("expenses",key).update({
+        expenses.child(key).update({
           desc: newExpense,
           valor: newValue,
         });
@@ -47,7 +47,7 @@ export default function Expense() {
   }
 
   async function deleteExpense(key) {
-    await firebase.database().ref(uid,"/expenses").child(key).remove();
+    await firebase.database().ref("expenses").child(key).remove();
   }
 
   const inputRef = useRef(null);
@@ -61,7 +61,7 @@ export default function Expense() {
     async function loadExpense() {
       await firebase
         .database()
-        .ref(uid,"/expenses")
+        .ref("expenses")
         .on("value", (snapshot) => {
           setexpenses([]);
           snapshot.forEach((item) => {
